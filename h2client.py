@@ -6,7 +6,7 @@ import scapy.config
 import scapy.packet as packet
 from gen_frm import extract_type, build_frame, load_data
 from helper_functions import _print_exception
-
+import time
 
 class H2Client:
 
@@ -160,7 +160,6 @@ class H2Client:
                     print("-" * 32 + "RECEIVING" + "-" * 32)
                     new_frame.show()
             except:
-                import time
                 time.sleep(1)
                 new_frame = None
 
@@ -230,3 +229,25 @@ if __name__ == '__main__':
     
     h2client = H2Client(verbose=True)
     h2client.send(dn = '172.17.168.200', port=443,file_name="./caddy_attack_data.json", anomaly_type='no_missmatch_check_frm1')
+    h2client.send(dn = '172.17.168.200', port=443,file_name="./normal_get_data.json", anomaly_type='get_frm')
+
+    h2client.send(dn = '172.17.168.200', port=443,file_name="./caddy_attack_data.json", anomaly_type='header_after_end_header_frm1')
+    h2client.send(dn = '172.17.168.200', port=443,file_name="./normal_get_data.json", anomaly_type='get_frm')
+
+    h2client.send(dn = '172.17.168.200', port=443,file_name="./caddy_attack_data.json", anomaly_type='header_after_end_header_frm2')
+    h2client.send(dn = '172.17.168.200', port=443,file_name="./normal_get_data.json", anomaly_type='get_frm')
+
+    h2client.send(dn = '172.17.168.200', port=443,file_name="./caddy_attack_data.json", anomaly_type='header_after_end_header_frm3')
+    h2client.send(dn = '172.17.168.200', port=443,file_name="./normal_get_data.json", anomaly_type='get_frm')
+
+    h2client.send(dn = '172.17.168.200', port=443,file_name="./caddy_attack_data.json", anomaly_type='header_after_end_header_frm4')
+    h2client.send(dn = '172.17.168.200', port=443,file_name="./normal_get_data.json", anomaly_type='get_frm')
+
+    h2client.send(dn = '172.17.168.200', port=443,file_name="./caddy_attack_data.json", anomaly_type='miss_end_stream_frm1')
+    h2client.send(dn = '172.17.168.200', port=443,file_name="./normal_get_data.json", anomaly_type='get_frm')
+
+    h2client.send(dn = '172.17.168.200', port=443,file_name="./caddy_attack_data.json", anomaly_type='miss_end_stream_frm2')
+    h2client.send(dn = '172.17.168.200', port=443,file_name="./normal_get_data.json", anomaly_type='get_frm')
+
+    h2client.send(dn = '47.96.175.128', port=443,file_name="./caddy_attack_data.json", anomaly_type='keep_alive')
+    h2client.send(dn='172.17.168.200', port=443, file_name="./normal_get_data.json", anomaly_type='get_frm')
