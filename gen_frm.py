@@ -15,27 +15,6 @@ def extract_type(frame_name):
         frame_type = 'goaway'
     return frame_type
 
-#            elif frame_type == 'goaway':
-#                 flags_node = find_node(node.children, 'flags')
-#                 stream_id_node = find_node(node.children, 'stream-id')
-#                 last_stream_id_node = find_node(node.children, 'last-id')
-#                 error_node = find_node(node.children, 'error')
-#                 additional_data_node = find_node(node.children, 'additional-data')
-#
-#                 if flags_node.children[0].symbol != 'NONE':
-#                     flag_values = set(flags_node.children[0].symbol.split(';'))
-#                 else:
-#                     flag_values = set()
-#                 id_value = int(stream_id_node.children[0].symbol)
-#                 last_stream_id_value = last_stream_id_node.children[0].symbol
-#                 error_value = error_node.children[0].symbol
-#                 additional_data_value = additional_data_node.children[0].symbol
-#
-#                 self.frame_literals[node.id]["last_stream_id"] = last_stream_id_value
-#                 self.frame_literals[node.id]["error"] = h2.H2ErrorCodes.literal[int(error_value)]
-#                 self.frame_literals[node.id]["additional_data"] = additional_data_value
-#                 self.frame_literals[node.id]["flags"] = sorted(flag_values, reverse=True)
-#                 return h2.H2Frame(flags = flag_values, stream_id = id_value)/h2.H2GoAwayFrame(last_stream_id = int(last_stream_id_value), error = int(error_value), additional_data=additional_data_value.encode())
 
 
 def extract_headers(fileds_dict):
@@ -78,33 +57,13 @@ def build_frame(fileds_dict, frame_type):
             padding_payload = fileds_dict['padding']
             return h2.H2Frame(flags=flag_values, stream_id=id_value) / h2.H2PaddedDataFrame(data=payload,
                                                                                             padding=padding_payload.encode())
-    #  elif frame_type == 'goaway':
-    # #                 flags_node = find_node(node.children, 'flags')
-    # #                 stream_id_node = find_node(node.children, 'stream-id')
-    # #                 last_stream_id_node = find_node(node.children, 'last-id')
-    # #                 error_node = find_node(node.children, 'error')
-    # #                 additional_data_node = find_node(node.children, 'additional-data')
-    # #
-    # #                 if flags_node.children[0].symbol != 'NONE':
-    # #                     flag_values = set(flags_node.children[0].symbol.split(';'))
-    # #                 else:
-    # #                     flag_values = set()
-    # #                 id_value = int(stream_id_node.children[0].symbol)
-    # #                 last_stream_id_value = last_stream_id_node.children[0].symbol
-    # #                 error_value = error_node.children[0].symbol
-    # #                 additional_data_value = additional_data_node.children[0].symbol
-    # #
-    # #                 self.frame_literals[node.id]["last_stream_id"] = last_stream_id_value
-    # #                 self.frame_literals[node.id]["error"] = h2.H2ErrorCodes.literal[int(error_value)]
-    # #                 self.frame_literals[node.id]["additional_data"] = additional_data_value
-    # #                 self.frame_literals[node.id]["flags"] = sorted(flag_values, reverse=True)
-    # #                 return h2.H2Frame(flags = flag_values, stream_id = id_value)/
-    # h2.H2GoAwayFrame(last_stream_id = int(last_stream_id_value), error = int(error_value), additional_data=additional_data_value.encode())
+
     elif frame_type == 'goaway':
         flag_values = set(fileds_dict['flags'])
         id_value = 1
         fileds_dict.pop('flags')
         last_stream_id_value = fileds_dict['last_stream_id']
+        # 这个位置取出error还有点问题
         error = fileds_dict['error']
         # print(error)
 

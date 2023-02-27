@@ -216,7 +216,7 @@ class H2Client:
                             error_codes.append(h2.H2ErrorCodes.literal[new_frame.getfieldval('error')].encode())
                         break
             except Exception as e:
-                _print_exception(["seed=" + str(self.seed), "host=" + str(self.target_addr)])
+                _print_exception(["host=" + str(self.target_addr)])
                 import time
                 time.sleep(1)
                 new_frame = None
@@ -249,5 +249,3 @@ if __name__ == '__main__':
     h2client.send(dn = '172.17.168.200', port=443,file_name="./caddy_attack_data.json", anomaly_type='miss_end_stream_frm2')
     h2client.send(dn = '172.17.168.200', port=443,file_name="./normal_get_data.json", anomaly_type='get_frm')
 
-    h2client.send(dn = '47.96.175.128', port=443,file_name="./caddy_attack_data.json", anomaly_type='keep_alive')
-    h2client.send(dn='172.17.168.200', port=443, file_name="./normal_get_data.json", anomaly_type='get_frm')
