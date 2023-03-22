@@ -2,7 +2,7 @@
 Reproduce the attack section of FrameShifter
 
 # 使用
-直接执行main.py即可
+直接执行main.py可间隔5s发送Content-Length Incomplete Withoutbody
 
 
 环境参照requirements python3.6.9

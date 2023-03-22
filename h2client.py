@@ -29,11 +29,12 @@ class H2Client:
         frames_dict = load_data(file_name=file_name)
         frames = []
         for anomaly_name, frame_dict in frames_dict.items():
+            # print(frame_dict)
             for frame_name, frame_fileds in frame_dict.items():
                 frame_type = extract_type(frame_name=frame_name)
                 frame = build_frame(fileds_dict=frame_fileds, frame_type=frame_type)
                 if anomaly_name == anomaly_type:
-                    frame.show()
+                    # frame.show()
                     frames.append(frame)
         # print(frames)
         return frames
@@ -58,6 +59,7 @@ class H2Client:
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         # sockaddr
         ip_and_port = addr_info[0][4]
+        # print(f'ip_and_port{ip_and_port}')
         # ssl上下文对象
         # 选译 TLS 版本 1.2 作为通道加密协议
         ssl_ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
@@ -89,27 +91,30 @@ class H2Client:
         # 这个是建立连接
         ssl_sock.connect(ip_and_port)
         # 检查协议是不是http2
-        print(ssl_sock.selected_alpn_protocol())
+        # print(ssl_sock.selected_alpn_protocol())
         assert ('h2' == ssl_sock.selected_alpn_protocol())
         scapy.config.conf.debug_dissector = True
         ssl_stream_sock = supersocket.SSLStreamSocket(ssl_sock, basecls=h2.H2Frame)
         self.sock = ssl_stream_sock
+        # s.connect(ip_and_port)
+        # self.sock = s
 
     # 建立http2连接
     def initial_h2_exchange(self):
         # SENDING MAGIC
         magic = packet.Raw(h2.H2_CLIENT_CONNECTION_PREFACE)
-        if self.verbose:
-            print("-" * 32 + "SENDING" + "-" * 32)
-            magic.show()
+        # magic = h2.H2_CLIENT_CONNECTION_PREFACE
+        # if self.verbose:
+        #     print("-" * 32 + "SENDING" + "-" * 32)
+        #     magic.show()
         self.sock.send(magic)
-        magic.show()
+        
         # RECEIVING
         srv_set = self.sock.recv()
-        srv_set.show()
-        if self.verbose:
-            print("-" * 32 + "RECEIVING" + "-" * 32)
-            srv_set.show()
+        # srv_set.show()
+        # if self.verbose:
+        #     print("-" * 32 + "RECEIVING" + "-" * 32)
+        #     srv_set.show()
         srv_max_frm_sz = 1 << 14
         srv_hdr_tbl_sz = 4096
         srv_max_hdr_tbl_sz = 0
@@ -143,9 +148,9 @@ class H2Client:
             own_set,
         ]
         for frame in h2seq.frames:
-            if self.verbose:
-                print("-" * 32 + "SENDING" + "-" * 32)
-                frame.show()
+            # if self.verbose:
+            #     print("-" * 32 + "SENDING" + "-" * 32)
+            #     frame.show()
             self.sock.send(frame)
 
         # while loop for waiting until ack is received for client's settings
@@ -156,9 +161,9 @@ class H2Client:
         ):
             try:
                 new_frame = self.sock.recv()
-                if self.verbose:
-                    print("-" * 32 + "RECEIVING" + "-" * 32)
-                    new_frame.show()
+                # if self.verbose:
+                #     print("-" * 32 + "RECEIVING" + "-" * 32)
+                #     new_frame.show()
             except:
                 time.sleep(1)
                 new_frame = None
@@ -170,10 +175,10 @@ class H2Client:
             # 创建帧序列并且发送
             sequence = h2.H2Seq()
             sequence.frames = frames
-            for frame in sequence.frames:
-                if self.verbose:
-                    print("-" * 32 + "SENDING" + "-" * 32)
-                    frame.show()
+            # for frame in sequence.frames:
+            #     if self.verbose:
+            #         print("-" * 32 + "SENDING" + "-" * 32)
+            #         frame.show()
             self.sock.send(sequence)
 
         new_frame = None
@@ -223,29 +228,3 @@ class H2Client:
         # 返回响应
         return b'response-code: ' + b','.join(status_codes) + b'\r\nerror: ' + b','.join(
             error_codes) + b'\r\n\r\n' + response_data
-
-
-if __name__ == '__main__':
-    
-    h2client = H2Client(verbose=True)
-    h2client.send(dn = '172.17.168.200', port=443,file_name="./caddy_attack_data.json", anomaly_type='no_missmatch_check_frm1')
-    h2client.send(dn = '172.17.168.200', port=443,file_name="./normal_get_data.json", anomaly_type='get_frm')
-
-    h2client.send(dn = '172.17.168.200', port=443,file_name="./caddy_attack_data.json", anomaly_type='header_after_end_header_frm1')
-    h2client.send(dn = '172.17.168.200', port=443,file_name="./normal_get_data.json", anomaly_type='get_frm')
-
-    h2client.send(dn = '172.17.168.200', port=443,file_name="./caddy_attack_data.json", anomaly_type='header_after_end_header_frm2')
-    h2client.send(dn = '172.17.168.200', port=443,file_name="./normal_get_data.json", anomaly_type='get_frm')
-
-    h2client.send(dn = '172.17.168.200', port=443,file_name="./caddy_attack_data.json", anomaly_type='header_after_end_header_frm3')
-    h2client.send(dn = '172.17.168.200', port=443,file_name="./normal_get_data.json", anomaly_type='get_frm')
-
-    h2client.send(dn = '172.17.168.200', port=443,file_name="./caddy_attack_data.json", anomaly_type='header_after_end_header_frm4')
-    h2client.send(dn = '172.17.168.200', port=443,file_name="./normal_get_data.json", anomaly_type='get_frm')
-
-    h2client.send(dn = '172.17.168.200', port=443,file_name="./caddy_attack_data.json", anomaly_type='miss_end_stream_frm1')
-    h2client.send(dn = '172.17.168.200', port=443,file_name="./normal_get_data.json", anomaly_type='get_frm')
-
-    h2client.send(dn = '172.17.168.200', port=443,file_name="./caddy_attack_data.json", anomaly_type='miss_end_stream_frm2')
-    h2client.send(dn = '172.17.168.200', port=443,file_name="./normal_get_data.json", anomaly_type='get_frm')
-

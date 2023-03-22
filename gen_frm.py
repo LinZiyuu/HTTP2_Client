@@ -13,6 +13,8 @@ def extract_type(frame_name):
         frame_type = 'padded-headers'
     elif frame_name.startswith('<goaway-frame'):
         frame_type = 'goaway'
+    elif frame_name.startswith('<priority-headers-frame'):
+        frame_type = 'priority-headers'
     return frame_type
 
 
@@ -47,6 +49,16 @@ def build_frame(fileds_dict, frame_type):
             headers_lst = extract_headers(fileds_dict)
             return h2.H2Frame(flags=flag_values, stream_id=id_value) / h2.H2PaddedHeadersFrame(hdrs=headers_lst,
                                                                                            padding=padding_payload.encode())
+        elif frame_type == 'priority-headers':
+            exclusive_value = fileds_dict['exclusive']
+            dependency_value = fileds_dict['dependency']
+            weight_value = fileds_dict['weight']
+            fileds_dict.pop('exclusive')
+            fileds_dict.pop('dependency')
+            fileds_dict.pop( 'weight')
+            headers_lst = extract_headers(fileds_dict)
+            return h2.H2Frame(flags = flag_values, stream_id = id_value)/h2.H2PriorityHeadersFrame(exclusive=int(exclusive_value), stream_dependency = int(dependency_value), weight = int(weight_value), hdrs=headers_lst)
+    
     elif frame_type == 'data' or frame_type == 'padded-data':
         flag_values = set(fileds_dict['flags'])
         id_value = 1
@@ -87,7 +99,7 @@ if __name__ == "__main__":
         for frame_name, frame_fileds in frame_dict.items():
             frame_type = extract_type(frame_name=frame_name)
             frame = build_frame(fileds_dict=frame_fileds, frame_type=frame_type)
-            frame.show()
+            # frame.show()
             frames.append(frame)
 
 
